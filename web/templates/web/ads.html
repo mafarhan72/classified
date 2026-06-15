@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Ads - AllofCanada</title>
+    <!-- Bootstrap 5.3.3 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Base Layout */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fdfdfd;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Navigation */
+        header {
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #0000ee;
+        }
+        nav a {
+            margin-left: 15px;
+            text-decoration: none;
+            color: #0000ee;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Content Layout split into Sidebar & Content */
+        .container-fluid.main-content {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Filter Sidebar */
+        .filter-sidebar {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        .filter-group label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .filter-group select, 
+        .filter-group input {
+            width: 100%;
+            padding: 6px;
+            font-size: 14px;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+        }
+        .filter-btn {
+            width: 100%;
+            padding: 8px;
+            background-color: #efefef;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .filter-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Ads List View */
+        .ads-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .ad-item {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+        }
+        .ad-image-placeholder {
+            width: 100px;
+            height: 100px;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #777;
+            flex-shrink: 0;
+        }
+        .ad-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .ad-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .ad-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0000ee;
+            text-decoration: none;
+        }
+        .ad-title:hover {
+            text-decoration: underline;
+        }
+        .ad-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .ad-meta {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Simple Pagination Links */
+        .pagination-container {
+            margin-top: 30px;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .pagination-links a, 
+        .pagination-links span {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            margin: 0 2px;
+            text-decoration: none;
+            color: #0000ee;
+            font-size: 14px;
+        }
+        .pagination-links span.current {
+            background-color: #f0f0f0;
+            color: #333;
+            font-weight: bold;
+        }
+        .pagination-links a:hover {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo">AllofCanada</a>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">Ads</a>
+            <a href="#">Contact</a>
+            <a href="{% url "login" %}">Login</a>
+            <a href="{% url "register" %}">Register</a>
+        </nav>
+    </header>
+
+    <div class="container-fluid main-content">
+        <div class="row">
+            
+            <!-- Filter Sidebar Column -->
+            <aside class="col-md-3">
+                <div class="filter-sidebar">
+                    <h4 class="fs-5 mb-3 border-bottom pb-2">Filters</h4>
+                    <form action="#" method="GET">
+                        
+                        <div class="filter-group">
+                            <label for="filter_category">Category</label>
+                            <select id="filter_category" name="category">
+                                <option value="all">All Categories</option>
+                                <option value="jobs">Jobs / Work</option>
+                                <option value="realestate">Real Estate</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="cars">Cars & Vehicles</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="filter_location">Location / City</label>
+                            <input type="text" id="filter_location" name="location" placeholder="e.g., Toronto">
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="filter_sort">Sort By</label>
+                            <select id="filter_sort" name="sort">
+                                <option value="latest">Latest</option>
+                                <option value="oldest">Oldest</option>
+                                <option value="price_low">Price: Low to High</option>
+                                <option value="price_high">Price: High to Low</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="filter-btn">Apply Filters</button>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Ads Content Column -->
+            <main class="col-md-9">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Showing 1-4 of 20 ads</span>
+                </div>
+
+                <div class="ads-list">
+                    
+                    <!-- Ad Item 1 -->
+                    <div class="ad-item">
+                        <div class="ad-image-placeholder">No Image</div>
+                        <div class="ad-details">
+                            <div>
+                                <div class="ad-header">
+                                    <a href="#" class="ad-title">iPhone 13 Pro Max - 256GB - Unlocked</a>
+                                    <span class="ad-price">$650</span>
+                                </div>
+                                <div class="ad-meta">Electronics &bull; Toronto, ON</div>
+                            </div>
+                            <div class="ad-meta text-end text-muted">Posted: 2 mins ago</div>
+                        </div>
+                    </div>
+
+                    <!-- Ad Item 2 -->
+                    <div class="ad-item">
+                        <div class="ad-image-placeholder">No Image</div>
+                        <div class="ad-details">
+                            <div>
+                                <div class="ad-header">
+                                    <a href="#" class="ad-title">1 Bedroom Apartment Downtown Sublet</a>
+                                    <span class="ad-price">$2,200/mo</span>
+                                </div>
+                                <div class="ad-meta">Real Estate / Housing &bull; Toronto, ON</div>
+                            </div>
+                            <div class="ad-meta text-end text-muted">Posted: 1 hour ago</div>
+                        </div>
+                    </div>
+
+                    <!-- Ad Item 3 -->
+                    <div class="ad-item">
+                        <div class="ad-image-placeholder">No Image</div>
+                        <div class="ad-details">
+                            <div>
+                                <div class="ad-header">
+                                    <a href="#" class="ad-title">Hiring Full-Time Software Developer</a>
+                                    <span class="ad-price">N/A</span>
+                                </div>
+                                <div class="ad-meta">Jobs / Work &bull; Remote / Toronto</div>
+                            </div>
+                            <div class="ad-meta text-end text-muted">Posted: Yesterday</div>
+                        </div>
+                    </div>
+
+                    <!-- Ad Item 4 -->
+                    <div class="ad-item">
+                        <div class="ad-image-placeholder">No Image</div>
+                        <div class="ad-details">
+                            <div>
+                                <div class="ad-header">
+                                    <a href="#" class="ad-title">2015 Honda Civic LX - Great Condition</a>
+                                    <span class="ad-price">$11,500</span>
+                                </div>
+                                <div class="ad-meta">Cars & Vehicles &bull; Mississauga, ON</div>
+                            </div>
+                            <div class="ad-meta text-end text-muted">Posted: 3 days ago</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Pagination Footer Structure -->
+                <div class="pagination-container">
+                    <div class="pagination-links">
+                        <span>&laquo; Prev</span>
+                        <span class="current">1</span>
+                        <a href="?page=2">2</a>
+                        <a href="?page=3">3</a>
+                        <a href="?page=2">Next &raquo;</a>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+</body>
+</html>
