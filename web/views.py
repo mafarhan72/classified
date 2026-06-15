@@ -6,7 +6,7 @@ from django.conf import settings
 
 # Initialize AWS SDK clients
 S3_BUCKET_NAME = 'your-s3-bucket-name'
-DYNAMODB_TABLE_NAME = 'your-dynamodb-table-name'
+DYNAMODB_TABLE_NAME = 'ads_data'
 
 s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
