@@ -147,6 +147,7 @@
         <div class="auth-container">
             <h2>Create an Account</h2>
             <form action="#" method="POST">
+                {% csrf_token %}
                 <div class="form-row">
                     <div class="form-group">
                         <label for="first_name">First Name</label>

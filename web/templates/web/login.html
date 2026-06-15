@@ -127,6 +127,7 @@
         <div class="auth-container">
             <h2>Log In</h2>
             <form action="#" method="POST">
+                {% csrf_token %}
                 <div class="form-group">
                     <label for="username">Email or Mobile Number</label>
                     <input type="text" id="username" name="username" required>

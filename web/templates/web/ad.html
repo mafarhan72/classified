@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iPhone 13 Pro Max - AllofCanada</title>
-    <!-- Bootstrap 5.3.3 CDN -->
+    <title>{{ ad.title }} - AllofCanada</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* Base Layout */
@@ -59,8 +58,9 @@
             margin-bottom: 20px;
         }
         .main-image-view {
+            position: relative; /* Enabled positioning context for absolute side arrows */
             width: 100%;
-            height: 350px;
+            height: 450px;
             background-color: #eee;
             border: 1px solid #ddd;
             display: flex;
@@ -69,7 +69,44 @@
             color: #777;
             font-size: 16px;
             margin-bottom: 10px;
+            overflow: hidden;
         }
+        .main-image-view img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Side Navigation Arrows Styles */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            border: none;
+            font-size: 28px;
+            font-weight: bold;
+            padding: 10px 15px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.15s ease;
+            z-index: 10;
+        }
+        .nav-arrow:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+        }
+        .prev-arrow {
+            left: 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .next-arrow {
+            right: 0;
+            border-radius: 4px 0 0 4px;
+        }
+
+        /* Thumbnails Grid */
         .thumbnails-grid {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
@@ -85,9 +122,16 @@
             font-size: 11px;
             color: #888;
             cursor: pointer;
+            overflow: hidden;
+            transition: border-color 0.15s ease;
         }
-        .thumb-box:hover {
-            border-color: #0000ee;
+        .thumb-box:hover, .thumb-box.active {
+            border: 2px solid #0000ee;
+        }
+        .thumb-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         /* Information Panels */
@@ -146,7 +190,7 @@
         <a href="#" class="logo">AllofCanada</a>
         <nav>
             <a href="#">Home</a>
-            <a href="#">Ads</a>
+            <a href="{% url "ads" %}">Ads</a>
             <a href="#">Contact</a>
             <a href="{% url "login" %}">Login</a>
             <a href="{% url "register" %}">Register</a>
@@ -156,64 +200,59 @@
     <div class="main-container">
         <div class="row">
             
-            <!-- Left Side: Gallery and Description -->
             <main class="col-md-7">
                 
-                <!-- Pictures Grid (Up to 8) -->
                 <div class="gallery-container">
                     <div class="main-image-view">
-                        <span>Main Photo Display Area</span>
+                        {% if ad.image_urls %}
+                            <button class="nav-arrow prev-arrow" onclick="navigateImage(-1)">&lt;</button>
+                            
+                            <img id="mainDisplayWindow" src="{{ ad.image_urls.0 }}" alt="{{ ad.title }}">
+                            
+                            <button class="nav-arrow next-arrow" onclick="navigateImage(1)">&gt;</button>
+                        {% else %}
+                            <span>No Images Uploaded for this Listing</span>
+                        {% endif %}
                     </div>
+                    
                     <div class="thumbnails-grid">
-                        <div class="thumb-box">Img 1</div>
-                        <div class="thumb-box">Img 2</div>
-                        <div class="thumb-box">Img 3</div>
-                        <div class="thumb-box">Img 4</div>
-                        <div class="thumb-box">Img 5</div>
-                        <div class="thumb-box">Img 6</div>
-                        <div class="thumb-box">Img 7</div>
-                        <div class="thumb-box">Img 8</div>
+                        {% for img_url in ad.image_urls %}
+                            <div class="thumb-box {% if forloop.first %}active{% endif %}" onclick="setActiveImage({{ forloop.index0 }})">
+                                <img src="{{ img_url }}" alt="Thumbnail Step {{ forloop.counter }}">
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
 
-                <!-- Main Ad Body -->
                 <div class="ad-main-box">
-                    <h1 class="fs-3 mb-1">iPhone 13 Pro Max - 256GB - Unlocked</h1>
-                    <div class="price-tag">$650</div>
-                    <div class="meta-text">Category: Electronics &bull; Posted: 2 minutes ago</div>
+                    <h1 class="fs-3 mb-1">{{ ad.title }}</h1>
+                    <div class="price-tag">{% if ad.price != "N/A" %}${{ ad.price }}{% else %}N/A{% endif %}</div>
+                    <div class="meta-text" style="text-transform: capitalize;">Category: {{ ad.category }}</div>
                     
                     <div class="description-body">
-                        Selling an excellent condition iPhone 13 Pro Max. 
-                        Storage capacity is 256GB, completely factory unlocked to work with any carrier across Canada. 
-                        
-                        Battery health is currently at 87%. It has had a glass screen protector and solid case on since day one, so there are no scratches on the display panel. 
-                        
-                        Comes with the original box and an unused Apple lightning charging cable. Serious inquiries only. No trade offers, please.
+                        {{ ad.description }}
                     </div>
                 </div>
 
             </main>
 
-            <!-- Right Side: Location & Contact Panels -->
             <aside class="col-md-5">
                 
-                <!-- Location Panel -->
                 <div class="ad-sidebar-box">
                     <h3 class="fs-5 border-bottom pb-2 mb-3">Location</h3>
                     <ul class="info-list">
-                        <li><strong>City/Region:</strong> Toronto, ON</li>
-                        <li><strong>Postal Code:</strong> M5V 2T6</li>
-                        <li><strong>Street Address:</strong> 123 Yonge St</li>
+                        <li><strong>City/Region:</strong> {{ ad.city }}</li>
+                        <li><strong>Postal Code:</strong> {{ ad.zip_code }}</li>
+                        <li><strong>Street Address:</strong> {{ ad.address|default:"Not Disclosed" }}</li>
                     </ul>
                 </div>
 
-                <!-- Contact Panel -->
                 <div class="ad-sidebar-box">
                     <h3 class="fs-5 border-bottom pb-2 mb-3">Contact Advertiser</h3>
                     <ul class="info-list">
-                        <li><strong>Name:</strong> John Doe</li>
-                        <li><strong>Mobile:</strong> +1 (416) 555-0192</li>
-                        <li><strong>Email:</strong> john.doe@example.com</li>
+                        <li><strong>Name:</strong> {{ ad.contact_name }}</li>
+                        <li><strong>Mobile:</strong> {{ ad.contact_mobile }}</li>
+                        <li><strong>Email:</strong> {{ ad.contact_email }}</li>
                     </ul>
                 </div>
 
@@ -222,5 +261,46 @@
         </div>
     </div>
 
+    <script>
+        // Safely pass the template sequence values into a native JS array
+        const imageUrls = [
+            {% for img_url in ad.image_urls %}
+                "{{ img_url }}"{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        let currentImageIndex = 0;
+
+        function setActiveImage(index) {
+            if (imageUrls.length === 0) return;
+
+            // Handle wrap-around constraints seamlessly 
+            if (index >= imageUrls.length) {
+                currentImageIndex = 0;
+            } else if (index < 0) {
+                currentImageIndex = imageUrls.length - 1;
+            } else {
+                currentImageIndex = index;
+            }
+
+            // Sync structural nodes
+            const targetUrl = imageUrls[currentImageIndex];
+            document.getElementById('mainDisplayWindow').src = targetUrl;
+
+            // Re-evaluate stylesheet active tracking highlight flags
+            const thumbnails = document.querySelectorAll('.thumbnails-grid .thumb-box');
+            thumbnails.forEach((box, idx) => {
+                if (idx === currentImageIndex) {
+                    box.classList.add('active');
+                } else {
+                    box.classList.remove('active');
+                }
+            });
+        }
+
+        function navigateImage(direction) {
+            setActiveImage(currentImageIndex + direction);
+        }
+    </script>
 </body>
 </html>
