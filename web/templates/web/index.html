@@ -107,19 +107,30 @@
 <body>
 
     <header>
-        <a href="#" class="logo">AllofCanada</a>
+        <a href="{% url 'index' %}" class="logo">AllofCanada</a>
         <nav>
-            <a href="#">Home</a>
-            <a href="{% url "ads" %}">Ads</a>
+            <a href="{% url 'index' %}">Home</a>
+            <a href="{% url 'ads' %}">Ads</a>
             <a href="#">Contact</a>
-            <a href="{% url "login" %}">Login</a>
-            <a href="{% url "register" %}">Register</a>
+
+            {% if request.session.user_email %}
+                <a href="{% url 'profile' %}">My Profile</a>
+                {% if request.session.ad_count >= 3 %}
+                    <a href="#" onclick="alert('3 ads are allowed to be active at once. Please delete old ads to put on new ads.'); return false;" style="color: #999; cursor: not-allowed;">Post an Ad</a>
+                {% else %}
+                    <a href="{% url 'post-ad' %}">Post an Ad</a>
+                {% endif %}
+                <a href="{% url 'logout' %}" style="color: #cc0000;">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            {% endif %}
         </nav>
     </header>
 
     <section class="search-section">
         <h1>Find items, housing, jobs, and more</h1>
-        <form action="#" method="GET">
+        <form action="{% url 'ads' %}" method="GET">
             <input type="text" name="q" class="search-box" placeholder="What are you looking for?">
             <button type="submit" class="search-btn">Search</button>
         </form>
@@ -130,40 +141,40 @@
             <div class="column">
                 <h3>Community</h3>
                 <ul>
-                    <li><a href="#">Activities</a></li>
-                    <li><a href="#">Groups</a></li>
-                    <li><a href="#">Local News</a></li>
-                    <li><a href="#">Volunteers</a></li>
+                    <li><a href="{% url 'ads' %}?category=community">Activities</a></li>
+                    <li><a href="{% url 'ads' %}?category=community">Groups</a></li>
+                    <li><a href="{% url 'ads' %}?category=community">Local News</a></li>
+                    <li><a href="{% url 'ads' %}?category=community">Volunteers</a></li>
                 </ul>
             </div>
 
             <div class="column">
                 <h3>Housing</h3>
                 <ul>
-                    <li><a href="#">Apartments / Rent</a></li>
-                    <li><a href="#">House for Sale</a></li>
-                    <li><a href="#">Office / Commercial</a></li>
-                    <li><a href="#">Roommates</a></li>
+                    <li><a href="{% url 'ads' %}?category=realestate">Apartments / Rent</a></li>
+                    <li><a href="{% url 'ads' %}?category=realestate">House for Sale</a></li>
+                    <li><a href="{% url 'ads' %}?category=realestate">Office / Commercial</a></li>
+                    <li><a href="{% url 'ads' %}?category=realestate">Roommates</a></li>
                 </ul>
             </div>
 
             <div class="column">
                 <h3>For Sale</h3>
                 <ul>
-                    <li><a href="#">Appliances</a></li>
-                    <li><a href="#">Cars & Trucks</a></li>
-                    <li><a href="#">Electronics</a></li>
-                    <li><a href="#">Furniture</a></li>
+                    <li><a href="{% url 'ads' %}?category=forsale">Appliances</a></li>
+                    <li><a href="{% url 'ads' %}?category=cars">Cars & Trucks</a></li>
+                    <li><a href="{% url 'ads' %}?category=electronics">Electronics</a></li>
+                    <li><a href="{% url 'ads' %}?category=forsale">Furniture</a></li>
                 </ul>
             </div>
 
             <div class="column">
                 <h3>Jobs</h3>
                 <ul>
-                    <li><a href="#">Customer Service</a></li>
-                    <li><a href="#">Education</a></li>
-                    <li><a href="#">Software / Tech</a></li>
-                    <li><a href="#">General Labor</a></li>
+                    <li><a href="{% url 'ads' %}?category=jobs">Customer Service</a></li>
+                    <li><a href="{% url 'ads' %}?category=jobs">Education</a></li>
+                    <li><a href="{% url 'ads' %}?category=jobs">Software / Tech</a></li>
+                    <li><a href="{% url 'ads' %}?category=jobs">General Labor</a></li>
                 </ul>
             </div>
         </div>

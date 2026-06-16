@@ -133,15 +133,33 @@
 <body>
 
     <header>
-        <a href="#" class="logo">AllofCanada</a>
-        <nav>
-            <a href="{% url "home" %}">Home</a>
-            <a href="{% url "ads" %}">Ads</a>
-            <a href="#">Contact</a>
-            <a href="{% url "login" %}">Login</a>
-            <a href="{% url "register" %}">Register</a>
-        </nav>
-    </header>
+    <a href="{% url 'index' %}" class="logo">AllofCanada</a>
+    <nav>
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'ads' %}">Ads</a>
+        <a href="#">Contact</a>
+
+        {% if request.session.user_email %}
+            <a href="{% url 'profile' %}">My Profile</a>
+            
+            {% if request.session.ad_count >= 3 %}
+                <a href="#" 
+                   onclick="alert('3 ads are allowed to be active at once. Please delete old ads to put on new ads.'); return false;" 
+                   style="color: #999; cursor: not-allowed;" 
+                   title="3 ads are allowed to be active at once. Please delete old ads to put on new ads.">
+                   Post an Ad
+                </a>
+            {% else %}
+                <a href="{% url 'post-ad' %}">Post an Ad</a>
+            {% endif %}
+            
+            <a href="{% url 'logout' %}" style="color: #cc0000;">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+    </nav>
+</header>
 
     <div class="auth-wrapper">
         <div class="auth-container">
