@@ -12,5 +12,7 @@ urlpatterns = [
     path('ad/edit/<str:ad_id>/', views.edit_ad_view, name='edit_ad'),
     path('ad/delete/<str:ad_id>/', views.delete_ad_view, name='delete_ad'),
     path('logout/', views.logout_view, name='logout'),
+    path('ad/report/', views.report_ad, name='report-ad'),
+
     
 ]

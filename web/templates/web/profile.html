@@ -92,10 +92,17 @@
                             {% endif %}
                             
                             <div class="flex-grow-1">
-                                <a href="{% url 'ad' %}?id={{ ad.ad_id }}" class="fw-bold text-decoration-none text-primary fs-5 d-block">{{ ad.title }}</a>
-                                <span class="text-dark fw-bold">{% if ad.price != "N/A" %}${{ ad.price }}{% else %}N/A{% endif %}</span>
-                                <span class="text-muted fs-6">&bull; {{ ad.city }}</span>
-                            </div>
+    <a href="{% url 'ad' %}?id={{ ad.ad_id }}" class="fw-bold text-decoration-none text-primary fs-5 d-block">
+        {{ ad.title }}
+    </a>
+    
+    {% if ad.is_visible is False %}
+        <span class="badge bg-danger mb-1">Hidden / Under Review</span>
+    {% endif %}
+    
+    <span class="text-dark fw-bold">{% if ad.price != "N/A" %}${{ ad.price }}{% else %}N/A{% endif %}</span>
+    <span class="text-muted fs-6">&bull; {{ ad.city }}</span>
+</div>
                             
                             <div>
                                 <a href="{% url 'edit_ad' ad.ad_id %}" class="action-link">Edit</a>

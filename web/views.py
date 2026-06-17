@@ -5,6 +5,7 @@ import boto3
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.contrib.auth.hashers import make_password, check_password
+from datetime import datetime
 
 
 # Initialize AWS SDK clients
@@ -15,6 +16,8 @@ s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('ads_data')
 users_table = dynamodb.Table('users_data')
+reports_table = dynamodb.Table('reports_data')
+
 
 # Create your views here.
 
@@ -123,14 +126,12 @@ def logout_view(request):
     return redirect('login')
 
 def ads(request):
-    # 1. Fetch query filtering and text search parameters from URL
     category_filter = request.GET.get('category', 'all')
     location_filter = request.GET.get('location', '').strip().lower()
     sort_filter = request.GET.get('sort', 'latest')
-    search_query = request.GET.get('q', '').strip().lower() # 🌟 NEW: Capture search keywords
+    search_query = request.GET.get('q', '').strip().lower() 
     page_number = request.GET.get('page', 1)
 
-    # 2. Scan entire table from DynamoDB
     try:
         response = table.scan()
         all_items = response.get('Items', [])
@@ -138,18 +139,19 @@ def ads(request):
         print(f"Error scanning DynamoDB: {e}")
         all_items = []
 
-    # 3. Apply Filters in Python
     filtered_items = []
     for item in all_items:
-        # Category Filter matching
+        # 🌟 NEW: Visibility Check Interceptor
+        # If explicitly marked False in DynamoDB, skip it completely from the public directory list
+        if item.get('is_visible') is False:
+            continue
+
         if category_filter != 'all' and item.get('category') != category_filter:
             continue
         
-        # Location / City Filter matching (Case-Insensitive substring match)
         if location_filter and location_filter not in item.get('city', '').lower():
             continue
             
-        # 🌟 NEW: Text Search Filter (Matches Title OR Description)
         if search_query:
             title_match = search_query in item.get('title', '').lower()
             desc_match = search_query in item.get('description', '').lower()
@@ -158,7 +160,7 @@ def ads(request):
             
         filtered_items.append(item)
 
-    # 4. Apply Sorting
+    # Apply Sorting and Pagination remains exactly the same as your current file...
     if sort_filter == 'price_low':
         filtered_items.sort(key=lambda x: float(x.get('price')) if str(x.get('price', '')).isdigit() else float('inf'))
     elif sort_filter == 'price_high':
@@ -166,11 +168,9 @@ def ads(request):
     else:
         filtered_items.sort(key=lambda x: x.get('ad_id', ''), reverse=(sort_filter == 'latest'))
 
-    # 5. Paginate items to exactly 20 items max per page
     paginator = Paginator(filtered_items, 20)
     page_obj = paginator.get_page(page_number)
 
-    # 6. Build template context values
     context = {
         'page_obj': page_obj,
         'total_count': len(filtered_items),
@@ -178,12 +178,10 @@ def ads(request):
     return render(request, "web/ads.html", context)
 
 def ad(request):
-    # 1. Capture the unique 'id' string from the query parameters (?id=...)
     ad_id = request.GET.get('id')
     if not ad_id:
-        return redirect('ads') # Redirect back to directory if no ID is passed
+        return redirect('ads') 
 
-    # 2. Query DynamoDB using the partition key
     try:
         response = table.get_item(Key={'ad_id': ad_id})
         ad_item = response.get('Item')
@@ -191,13 +189,36 @@ def ad(request):
         print(f"Error pulling single ad record: {e}")
         ad_item = None
 
-    # 3. Handle cases where the item does not exist
-    if not ad_item:
-        return redirect('ads')
+    # Get the active logged-in user's email
+    user_email = request.session.get('user_email')
 
-    # 4. Pass the dictionary data cleanly into your context
+    # 🌟 UPDATED VISIBILITY CHECK WITH OWNER BYPASS
+    if not ad_item or ad_item.get('is_visible') is False:
+        # Check if the person clicking the link is the hidden background owner
+        if ad_item and ad_item.get('owner_email') == user_email:
+            # They built it! Allow them to view their own hidden/under-review ad details
+            pass
+        else:
+            # Strangers or logged-out guests get kicked out immediately
+            messages.error(request, "This advertisement is no longer available or is currently under administrative review.")
+            return redirect('ads')
+
+    # Check if this specific user has reported it
+    has_reported = False
+    if user_email:
+        try:
+            report_check = reports_table.scan(
+                FilterExpression=boto3.dynamodb.conditions.Attr('ad_id').eq(ad_id) & 
+                                 boto3.dynamodb.conditions.Attr('reporter_email').eq(user_email)
+            )
+            if report_check.get('Items'):
+                has_reported = True
+        except Exception as e:
+            print(f"Failed to verify report status history: {e}")
+
     context = {
-        'ad': ad_item
+        'ad': ad_item,
+        'has_reported': has_reported 
     }
     return render(request, "web/ad.html", context)
     
@@ -242,6 +263,7 @@ def post_ad(request):
         image_urls = []
         main_file = request.FILES.get('main_image')
         supporting_files = request.FILES.getlist('supporting_images')[:7]
+        posted_date = datetime.now().strftime("%B %d, %Y")
         
         all_uploads = []
         if main_file:
@@ -272,6 +294,8 @@ def post_ad(request):
                 Item={
                     'ad_id': ad_id,
                     'owner_email': user_email,     # 🌟 FIXED: Tracks who owns the post behind the scenes
+                    'is_visible': True,
+                    'posted_at': posted_date,
                     'category': category,
                     'title': title,
                     'price': price,
@@ -402,3 +426,55 @@ def delete_ad_view(request, ad_id):
         messages.error(request, 'Failed to delete advertisement.')
         
     return redirect('profile')
+
+
+def report_ad(request):
+    user_email = get_current_user_email(request)
+    if not user_email:
+        messages.error(request, "You must be logged in to report an advertisement.")
+        return redirect('login')
+
+    if request.method == 'POST':
+        ad_id = request.POST.get('ad_id')
+        ad_title = request.POST.get('ad_title')
+        owner_email = request.POST.get('owner_email') # Identifies who posted the ad
+        reason = request.POST.get('reason')
+        comment = request.POST.get('comment', '').strip()
+
+        # Strict validation checks
+        if not reason or not comment:
+            messages.error(request, "All fields on the reporting form are mandatory.")
+            return redirect(f"/ad/?id={ad_id}")
+
+        try:
+            report_id = str(uuid.uuid4())
+            
+            # Save the logged tracking report down to AWS
+            reports_table.put_item(
+                Item={
+                    'report_id': report_id,
+                    'ad_id': ad_id,
+                    'ad_title': ad_title,
+                    'owner_email': owner_email,       # Accountability anchor
+                    'reporter_email': user_email,    # Tracking identity
+                    'reason': reason,
+                    'comment': comment,
+                }
+            )
+            messages.success(request, "Thank you. Your report has been submitted for administrative review.")
+            
+        except Exception as e:
+            print(f"Reporting database injection fault: {e}")
+            messages.error(request, "Failed to capture report due to a system error.")
+
+        return redirect(f"/ad/?id={ad_id}")
+        
+    return redirect('ads')
+
+
+
+
+
+
+
+

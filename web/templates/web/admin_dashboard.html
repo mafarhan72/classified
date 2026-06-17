@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderation Center - AllofCanada</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; color: #333; margin: 0; padding: 20px; }
+        .dashboard-card { background: #fff; border: 1px solid #ccc; padding: 25px; margin-top: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .table th { background-color: #f8f9fa; color: #555; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .table td { vertical-align: middle; font-size: 14px; }
+        .badge-visible { background-color: #198754; color: #fff; }
+        .badge-hidden { background-color: #dc3545; color: #fff; }
+        .profile-box { background-color: #fdfdfd; border: 1px dashed #bbb; padding: 10px; font-size: 13px; border-radius: 4px; }
+        .action-form { display: inline-block; margin: 0 2px; }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid max-width-1400">
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-3">
+            <h1 class="fs-3 fw-bold m-0 text-dark">AllofCanada Moderation Command Portal</h1>
+            <a href="{% url 'index' %}" class="btn btn-sm btn-outline-secondary">Return to Main Site</a>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning{% else %}success{% endif %} alert-dismissible fade show mt-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="dashboard-card">
+            <h3 class="fs-5 border-bottom pb-2 mb-3 fw-bold text-secondary">Incoming Content Violation Reports</h3>
+            
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered border-light align-middle">
+                    <thead>
+                        <tr>
+                            <th>Target Listing Details</th>
+                            <th>Violation Category</th>
+                            <th>Mandatory Explanatory Notes</th>
+                            <th>Reporter Information</th>
+                            <th>Advertiser Profile Details & Actions</th>
+                            <th>Listing Controls</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in reports %}
+                            <tr>
+                                <td>
+                                    <span class="fw-bold d-block text-dark">{{ item.ad_title }}</span>
+                                    <small class="text-muted d-block mb-1">ID: {{ item.ad_id }}</small>
+                                    {% if item.is_ad_visible %}
+                                        <span class="badge badge-visible">Publicly Live</span>
+                                    {% else %}
+                                        <span class="badge badge-hidden">Hidden from Directory</span>
+                                    {% endif %}
+                                </td>
+                                
+                                <td class="fw-bold text-danger">
+                                    {{ item.reason }}
+                                </td>
+                                
+                                <td class="text-muted" style="max-width: 250px; white-space: pre-line;">{{ item.comment }}</td>
+                                
+                                <td class="small">{{ item.reporter_email }}</td>
+                                
+                                <td>
+                                    <div class="profile-box">
+                                        <strong>Name:</strong> {{ item.owner_name }}<br>
+                                        <strong>Email:</strong> {{ item.owner_email }}<br>
+                                        <strong>Mobile:</strong> {{ item.owner_mobile }}<br>
+                                        <hr class="my-1">
+                                        <strong>Infractions Issued:</strong> <span class="badge bg-dark text-white">{{ item.owner_infractions }}</span><br>
+                                        <strong>Status:</strong> 
+                                        {% if item.is_owner_disabled %}
+                                            <span class="text-danger fw-bold">DISABLED BANNED</span>
+                                        {% else %}
+                                            <span class="text-success fw-bold">Active Account</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mt-2 text-center">
+                                        <form action="{% url 'admin-process-action' %}" method="POST" class="action-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action_type" value="increment_infraction">
+                                            <input type="hidden" name="target_email" value="{{ item.owner_email }}">
+                                            <button type="submit" class="btn btn-xs btn-outline-dark p-1 py-0" style="font-size: 11px;">+1 Infraction Strike</button>
+                                        </form>
+
+                                        <form action="{% url 'admin-process-action' %}" method="POST" class="action-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action_type" value="toggle_user_ban">
+                                            <input type="hidden" name="target_email" value="{{ item.owner_email }}">
+                                            <button type="submit" class="btn btn-xs {% if item.is_owner_disabled %}btn-success{% else %}btn-danger{% endif %} p-1 py-0 text-white" style="font-size: 11px;">
+                                                {% if item.is_owner_disabled %}Reinstate Profile{% else %}Disable Profile{% endif %}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                                
+                                <td class="text-center">
+                                    <form action="{% url 'admin-process-action' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action_type" value="toggle_ad_visibility">
+                                        <input type="hidden" name="target_ad_id" value="{{ item.ad_id }}">
+                                        <button type="submit" class="btn btn-sm {% if item.is_ad_visible %}btn-outline-danger{% else %}btn-outline-success{% endif %} w-100">
+                                            {% if item.is_ad_visible %}Mark Invisible{% else %}Restore Visibility{% endif %}
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center p-4 text-muted">No safety abuse or content violation reports have been logged in the data index repository.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

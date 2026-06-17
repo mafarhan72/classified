@@ -1,286 +1,367 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ ad.title }} - AllofCanada</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        /* Base Layout */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #fdfdfd;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* Header Navigation */
-        header {
-            background-color: #fff;
-            border-bottom: 1px solid #ccc;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo {
-            font-size: 22px;
-            font-weight: bold;
-            text-decoration: none;
-            color: #0000ee;
-        }
-        nav a {
-            margin-left: 15px;
-            text-decoration: none;
-            color: #0000ee;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-
-        /* Main Workspace Container */
-        .main-container {
-            max-width: 1000px;
-            width: 100%;
-            margin: 30px auto;
-            padding: 0 20px;
-            box-sizing: border-box;
-        }
-
-        /* Image Gallery Layout */
-        .gallery-container {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .main-image-view {
-            position: relative; /* Enabled positioning context for absolute side arrows */
-            width: 100%;
-            height: 450px;
-            background-color: #eee;
-            border: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #777;
-            font-size: 16px;
-            margin-bottom: 10px;
-            overflow: hidden;
-        }
-        .main-image-view img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        /* Side Navigation Arrows Styles */
-        .nav-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: rgba(0, 0, 0, 0.4);
-            color: #fff;
-            border: none;
-            font-size: 28px;
-            font-weight: bold;
-            padding: 10px 15px;
-            cursor: pointer;
-            user-select: none;
-            transition: background-color 0.15s ease;
-            z-index: 10;
-        }
-        .nav-arrow:hover {
-            background-color: rgba(0, 0, 0, 0.7);
-            color: #fff;
-        }
-        .prev-arrow {
-            left: 0;
-            border-radius: 0 4px 4px 0;
-        }
-        .next-arrow {
-            right: 0;
-            border-radius: 4px 0 0 4px;
-        }
-
-        /* Thumbnails Grid */
-        .thumbnails-grid {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 8px;
-        }
-        .thumb-box {
-            aspect-ratio: 1;
-            background-color: #eee;
-            border: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            color: #888;
-            cursor: pointer;
-            overflow: hidden;
-            transition: border-color 0.15s ease;
-        }
-        .thumb-box:hover, .thumb-box.active {
-            border: 2px solid #0000ee;
-        }
-        .thumb-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Information Panels */
-        .ad-main-box {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-        .ad-sidebar-box {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .price-tag {
-            font-size: 26px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .meta-text {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .description-body {
-            font-size: 15px;
-            line-height: 1.6;
-            white-space: pre-line;
-            border-top: 1px dashed #ccc;
-            padding-top: 15px;
-        }
-
-        /* Detail lists for location/contact */
-        .info-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .info-list li {
-            font-size: 14px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-        .info-list strong {
-            color: #555;
-        }
+      /* Base Layout */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #fdfdfd;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      
+      /* Header Navigation */
+      header {
+        background-color: #fff;
+        border-bottom: 1px solid #ccc;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .logo {
+        font-size: 22px;
+        font-weight: bold;
+        text-decoration: none;
+        color: #0000ee;
+      }
+      nav a {
+        margin-left: 15px;
+        text-decoration: none;
+        color: #0000ee;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      
+      /* Main Workspace Container */
+      .main-container {
+        max-width: 1000px;
+        width: 100%;
+        margin: 30px auto;
+        padding: 0 20px;
+        box-sizing: border-box;
+      }
+      
+      /* Image Gallery Layout */
+      .gallery-container {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+      .main-image-view {
+        position: relative;
+        width: 100%;
+        height: 450px;
+        background-color: #eee;
+        border: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #777;
+        font-size: 16px;
+        margin-bottom: 10px;
+        overflow: hidden;
+      }
+      .main-image-view img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      
+      /* Side Navigation Arrows Styles */
+      .nav-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.4);
+        color: #fff;
+        border: none;
+        font-size: 28px;
+        font-weight: bold;
+        padding: 10px 15px;
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.15s ease;
+        z-index: 10;
+      }
+      .nav-arrow:hover {
+        background-color: rgba(0, 0, 0, 0.7);
+        color: #fff;
+      }
+      .prev-arrow {
+        left: 0;
+        border-radius: 0 4px 4px 0;
+      }
+      .next-arrow {
+        right: 0;
+        border-radius: 4px 0 0 4px;
+      }
+      
+      /* Thumbnails Grid */
+      .thumbnails-grid {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 8px;
+      }
+      .thumb-box {
+        aspect-ratio: 1;
+        background-color: #eee;
+        border: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: #888;
+        cursor: pointer;
+        overflow: hidden;
+        transition: border-color 0.15s ease;
+      }
+      .thumb-box:hover,
+      .thumb-box.active {
+        border: 2px solid #0000ee;
+      }
+      .thumb-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      /* Information Panels */
+      .ad-main-box {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 25px;
+        margin-bottom: 20px;
+      }
+      .ad-sidebar-box {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      
+      .price-tag {
+        font-size: 26px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+      }
+      .meta-text {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 20px;
+      }
+      .description-body {
+        font-size: 15px;
+        line-height: 1.6;
+        white-space: pre-line;
+        border-top: 1px dashed #ccc;
+        padding-top: 15px;
+      }
+      
+      /* Detail lists for location/contact */
+      .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .info-list li {
+        font-size: 14px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+      }
+      .info-list strong {
+        color: #555;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <header>
-    <a href="{% url 'index' %}" class="logo">AllofCanada</a>
-    <nav>
+      <a href="{% url 'index' %}" class="logo">AllofCanada</a>
+      <nav>
         <a href="{% url 'index' %}">Home</a>
         <a href="{% url 'ads' %}">Ads</a>
         <a href="#">Contact</a>
 
         {% if request.session.user_email %}
-            <a href="{% url 'profile' %}">My Profile</a>
-            
-            {% if request.session.ad_count >= 3 %}
-                <a href="#" 
-                   onclick="alert('3 ads are allowed to be active at once. Please delete old ads to put on new ads.'); return false;" 
-                   style="color: #999; cursor: not-allowed;" 
-                   title="3 ads are allowed to be active at once. Please delete old ads to put on new ads.">
-                   Post an Ad
-                </a>
-            {% else %}
-                <a href="{% url 'post-ad' %}">Post an Ad</a>
-            {% endif %}
-            
-            <a href="{% url 'logout' %}" style="color: #cc0000;">Logout</a>
+          <a href="{% url 'profile' %}">My Profile</a>
+          {% if request.session.ad_count >= 3 %}
+            <a href="#" onclick="alert('3 ads are allowed to be active at once. Please delete old ads to put on new ads.'); return false;" style="color: #999; cursor: not-allowed;">Post an Ad</a>
+          {% else %}
+            <a href="{% url 'post-ad' %}">Post an Ad</a>
+          {% endif %}
+          <a href="{% url 'logout' %}" style="color: #cc0000;">Logout</a>
         {% else %}
-            <a href="{% url 'login' %}">Login</a>
-            <a href="{% url 'register' %}">Register</a>
+          <a href="{% url 'login' %}">Login</a>
+          <a href="{% url 'register' %}">Register</a>
         {% endif %}
-    </nav>
-</header>
+      </nav>
+    </header>
 
     <div class="main-container">
-        <div class="row">
-            
-            <main class="col-md-7">
-                
-                <div class="gallery-container">
-                    <div class="main-image-view">
-                        {% if ad.image_urls %}
-                            <button class="nav-arrow prev-arrow" onclick="navigateImage(-1)">&lt;</button>
-                            
-                            <img id="mainDisplayWindow" src="{{ ad.image_urls.0 }}" alt="{{ ad.title }}">
-                            
-                            <button class="nav-arrow next-arrow" onclick="navigateImage(1)">&gt;</button>
-                        {% else %}
-                            <span>No Images Uploaded for this Listing</span>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="thumbnails-grid">
-                        {% for img_url in ad.image_urls %}
-                            <div class="thumb-box {% if forloop.first %}active{% endif %}" onclick="setActiveImage({{ forloop.index0 }})">
-                                <img src="{{ img_url }}" alt="Thumbnail Step {{ forloop.counter }}">
-                            </div>
-                        {% endfor %}
-                    </div>
+      <!-- Display Submission Success/Failure Alert Banners -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}
+              danger
+            {% else %}
+              {{ message.tags }}
+            {% endif %} alert-dismissible fade show mb-4"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <div class="row">
+        <main class="col-md-7">
+          <div class="gallery-container">
+            <div class="main-image-view">
+              {% if ad.image_urls %}
+                <button class="nav-arrow prev-arrow" onclick="navigateImage(-1)">&lt;</button>
+                <img id="mainDisplayWindow" src="{{ ad.image_urls.0 }}" alt="{{ ad.title }}" />
+                <button class="nav-arrow next-arrow" onclick="navigateImage(1)">&gt;</button>
+              {% else %}
+                <span>No Images Uploaded for this Listing</span>
+              {% endif %}
+            </div>
+
+            <div class="thumbnails-grid">
+              {% for img_url in ad.image_urls %}
+                <div class="thumb-box {% if forloop.first %}active{% endif %}" onclick="setActiveImage({{ forloop.index0 }})">
+                  <img src="{{ img_url }}" alt="Thumbnail Step {{ forloop.counter }}" />
                 </div>
+              {% endfor %}
+            </div>
+          </div>
 
-                <div class="ad-main-box">
-                    <h1 class="fs-3 mb-1">{{ ad.title }}</h1>
-                    <div class="price-tag">{% if ad.price != "N/A" %}${{ ad.price }}{% else %}N/A{% endif %}</div>
-                    <div class="meta-text" style="text-transform: capitalize;">Category: {{ ad.category }}</div>
-                    
-                    <div class="description-body">
-                        {{ ad.description }}
-                    </div>
-                </div>
+          <div class="ad-main-box">
+            <h1 class="fs-3 mb-1">{{ ad.title }}</h1>
+            <div class="price-tag">
+              {% if ad.price != 'N/A' %}
+                ${{ ad.price }}
+              {% else %}
+                N/A
+              {% endif %}
+            </div>
+            <div class="meta-text text-muted">
+              <span style="text-transform: capitalize;">Category: {{ ad.category }}</span>
+              <span class="mx-2">&bull;</span>
+              <span>Posted on: {{ ad.posted_at|default:'Recently' }}</span>
+            </div>
 
-            </main>
+            <div class="description-body">{{ ad.description }}</div>
+          </div>
+        </main>
 
-            <aside class="col-md-5">
-                
-                <div class="ad-sidebar-box">
-                    <h3 class="fs-5 border-bottom pb-2 mb-3">Location</h3>
-                    <ul class="info-list">
-                        <li><strong>City/Region:</strong> {{ ad.city }}</li>
-                        <li><strong>Postal Code:</strong> {{ ad.zip_code }}</li>
-                        <li><strong>Street Address:</strong> {{ ad.address|default:"Not Disclosed" }}</li>
-                    </ul>
-                </div>
+        <aside class="col-md-5">
+          <div class="ad-sidebar-box">
+            <h3 class="fs-5 border-bottom pb-2 mb-3">Location</h3>
+            <ul class="info-list">
+              <li>
+                <strong>City/Region:</strong> {{ ad.city }}
+              </li>
+              <li>
+                <strong>Postal Code:</strong> {{ ad.zip_code }}
+              </li>
+              <li>
+                <strong>Street Address:</strong> {{ ad.address|default:'Not Disclosed' }}
+              </li>
+            </ul>
+          </div>
 
-                <div class="ad-sidebar-box">
-                    <h3 class="fs-5 border-bottom pb-2 mb-3">Contact Advertiser</h3>
-                    <ul class="info-list">
-                        <li><strong>Name:</strong> {{ ad.contact_name }}</li>
-                        <li><strong>Mobile:</strong> {{ ad.contact_mobile }}</li>
-                        <li><strong>Email:</strong> {{ ad.contact_email }}</li>
-                    </ul>
-                </div>
+          <div class="ad-sidebar-box">
+            <h3 class="fs-5 border-bottom pb-2 mb-3">Contact Advertiser</h3>
+            <ul class="info-list">
+              <li>
+                <strong>Name:</strong> {{ ad.contact_name }}
+              </li>
+              <li>
+                <strong>Mobile:</strong> {{ ad.contact_mobile }}
+              </li>
+              <li>
+                <strong>Email:</strong> {{ ad.contact_email }}
+              </li>
+            </ul>
+          </div>
 
-            </aside>
+          <!-- Flag Listing Interface Panel Section -->
+          <div class="ad-sidebar-box border-danger">
+            <h3 class="fs-5 text-danger border-bottom pb-2 mb-3">Safety & Trust</h3>
 
-        </div>
+            {% if request.session.user_email %}
+              <!-- 🌟 NEW: If already reported, mute the button and show an update note -->
+              {% if has_reported %}
+                <button type="button" class="btn btn-secondary w-100" style="background-color: #f8d7da; border-color: #f5c2c7; color: #842029; cursor: not-allowed;" disabled>You Have Reported This Ad</button>
+                <div class="form-text text-danger mt-2 text-center small fw-bold">Our moderation team is currently reviewing this listing.</div>
+              {% else %}
+                <!-- Safe to report for the first time -->
+                <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#reportModal">Report This Advertisement</button>
+              {% endif %}
+            {% else %}
+              <!-- Guest fallback protection state -->
+              <button type="button" class="btn btn-secondary w-100" style="background-color: #e2e2e2; border-color: #cccccc; color: #8c8c8c; cursor: not-allowed;" disabled title="Login to report">Login to Report This Ad</button>
+            {% endif %}
+          </div>
+        </aside>
+      </div>
     </div>
 
+    <!-- Bootstrap 5 Content Violation Reporting Modal Form Configuration Container -->
+    {% if request.session.user_email %}
+      <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title" id="reportModalLabel">Report Content Violation</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'report-ad' %}" method="POST">
+              {% csrf_token %}
+              <!-- Background tracking identifiers mapping components -->
+              <input type="hidden" name="ad_id" value="{{ ad.ad_id }}" />
+              <input type="hidden" name="ad_title" value="{{ ad.title }}" />
+              <input type="hidden" name="owner_email" value="{{ ad.owner_email }}" />
+
+              <div class="modal-body shadow-sm">
+                <div class="mb-3">
+                  <label for="reason" class="form-label fw-bold small text-secondary">Violation Category</label>
+                  <select class="form-select" id="reason" name="reason" required>
+                    <option value="" disabled selected>-- Select a Reason --</option>
+                    <option value="Spam">Spam / Misleading Content</option>
+                    <option value="Illegal">Illegal Goods / Services</option>
+                    <option value="Crime">Fraud / Scam / Criminal Enterprise</option>
+                    <option value="Racist">Hate Speech / Racist / Abusive Language</option>
+                    <option value="Other">Other Content Policy Infraction</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="comment" class="form-label fw-bold small text-secondary">Mandatory Explanatory Notes</label>
+                  <textarea class="form-control" id="comment" name="comment" rows="4" placeholder="Please clarify the exact item details breaking community compliance guidelines..." required></textarea>
+                </div>
+              </div>
+              <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-danger btn-sm px-4">Submit Report</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
     <script>
-        // Safely pass the template sequence values into a native JS array
         const imageUrls = [
             {% for img_url in ad.image_urls %}
                 "{{ img_url }}"{% if not forloop.last %},{% endif %}
@@ -292,7 +373,6 @@
         function setActiveImage(index) {
             if (imageUrls.length === 0) return;
 
-            // Handle wrap-around constraints seamlessly 
             if (index >= imageUrls.length) {
                 currentImageIndex = 0;
             } else if (index < 0) {
@@ -301,11 +381,9 @@
                 currentImageIndex = index;
             }
 
-            // Sync structural nodes
             const targetUrl = imageUrls[currentImageIndex];
             document.getElementById('mainDisplayWindow').src = targetUrl;
 
-            // Re-evaluate stylesheet active tracking highlight flags
             const thumbnails = document.querySelectorAll('.thumbnails-grid .thumb-box');
             thumbnails.forEach((box, idx) => {
                 if (idx === currentImageIndex) {
@@ -320,5 +398,8 @@
             setActiveImage(currentImageIndex + direction);
         }
     </script>
-</body>
+
+    <!-- Bootstrap JavaScript Bundle needed for launching responsive modals -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>
